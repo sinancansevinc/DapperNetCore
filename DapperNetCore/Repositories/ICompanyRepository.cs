@@ -6,9 +6,12 @@ namespace DapperNetCore.Repositories
 {
 	public interface ICompanyRepository
 	{
-		public Task<IEnumerable<Company>> GetCompanies();
-		public Task<Company> GetCompany(int id);
-		public Task<Company> CreateCompany(CompanyForCreationDto company);
+		Task<IEnumerable<Company>> GetCompanies();
+		Task<Company> GetCompany(int id);
+		Task CreateCompany(CompanyForCreationDto company);
+		Task UpdateCompany(int id, CompanyUpdateDto companyUpdateDto);
+		Task DeleteCompany(int id);
 
+		Task<Company> GetCompanyByEmployeeId(int id);
 	}
 }

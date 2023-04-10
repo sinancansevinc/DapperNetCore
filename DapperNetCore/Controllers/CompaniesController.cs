@@ -1,6 +1,7 @@
 ﻿using DapperNetCore.DTOS;
 using DapperNetCore.Repositories;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DapperNetCore.Controllers
@@ -16,7 +17,7 @@ namespace DapperNetCore.Controllers
 			_companyRepository = companyRepository;
 		}
 
-		[HttpGet]
+		[HttpGet("GetCompanies")]
 		public async Task<IActionResult> GetCompanies()
 		{
 			try
@@ -52,8 +53,64 @@ namespace DapperNetCore.Controllers
 		{
 			try
 			{
-				var createdCompany = await _companyRepository.CreateCompany(company);
-				return Ok(createdCompany);
+				await _companyRepository.CreateCompany(company);
+				return RedirectToAction("GetCompanies");
+			}
+			catch (Exception ex)
+			{
+				//log error
+				return StatusCode(500, ex.Message);
+			}
+		}
+
+		[HttpDelete("{id}")]
+		public async Task<IActionResult> DeleteCompany(int id)
+		{
+			try
+			{
+				var company = await _companyRepository.GetCompany(id);
+				if (company == null)
+					return NotFound();
+
+				await _companyRepository.DeleteCompany(id);
+				return NoContent();
+			}
+			catch (Exception ex)
+			{
+
+				//log error
+				return StatusCode(500, ex.Message);
+			}
+		}
+
+		[HttpPut("{id}")]
+		public async Task<IActionResult> UpdateCompany(int id, CompanyUpdateDto companyUpdateDto)
+		{
+			try
+			{
+				var company = await _companyRepository.GetCompany(id);
+				if (company == null)
+					return NotFound();
+				await _companyRepository.UpdateCompany(id, companyUpdateDto);
+				return NoContent();
+			}
+			catch (Exception ex)
+			{
+				//log error
+				return StatusCode(500, ex.Message);
+			}
+		}
+
+		[HttpGet("EmployeeId/{id}")]
+		public async Task<IActionResult> GetCompanyForEmployee(int id)
+		{
+			try
+			{
+				var company = await _companyRepository.GetCompanyByEmployeeId(id);
+				if (company == null)
+					return NotFound();
+
+				return Ok(company);
 			}
 			catch (Exception ex)
 			{
